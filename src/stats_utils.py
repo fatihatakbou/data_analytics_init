@@ -38,6 +38,7 @@ def analyser_ventes(transactions):
 
 
     # bloc test
+if __name__ == "__main__":
     donnees_test = [150, 200, 175, -50, 0, 3200, 220, 180, 195, 160]
 
     resultats = analyser_ventes(donnees_test)
