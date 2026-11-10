@@ -18,6 +18,13 @@ def analyser_ventes(transactions):
     # 3. Calculs statistiques avec describe()
     stats = df_propre["montant"].describe()
 
+    # Écart-type d'échantillon (n - 1) : avec une seule valeur, il n'est pas
+    # calculable (Pandas renvoie NaN), on renvoie None à la place
+    if stats["count"] < 2:
+        ecart_type = None
+    else:
+        ecart_type = round(float(stats["std"]), 2)
+
     # 4. Anomalies : transactions > 2 x la moyenne
     seuil = 2 * stats["mean"]
     anomalies = df_propre[df_propre["montant"] > seuil]
@@ -28,7 +35,7 @@ def analyser_ventes(transactions):
         "somme_totale": float(df_propre["montant"].sum()),
         "moyenne": round(float(stats["mean"]), 2),
         "mediane": float(stats["50%"]),
-        "ecart_type": round(float(stats["std"]), 2),
+        "ecart_type": ecart_type,
         "minimum": float(stats["min"]),
         "maximum": float(stats["max"]),
         "seuil_anomalie": float(seuil),
@@ -37,12 +44,17 @@ def analyser_ventes(transactions):
     }
 
 
-    # bloc test
+# bloc test
 if __name__ == "__main__":
-    donnees_test = [150, 200, 175, -50, 0, 3200, 220, 180, 195, 160]
+    jeux_de_test = {
+        "Cas normal avec anomalie": [10, 20, -5, 0, 30, 40, 900],
+        "Une seule valeur": [100],
+        "Aucune valeur valide": [-5, 0],
+    }
 
-    resultats = analyser_ventes(donnees_test)
-
-    print("=== ANALYSE VENTES ===")
-    for cle, valeur in resultats.items():
-        print(f"{cle} : {valeur}")
+    for nom, donnees in jeux_de_test.items():
+        print(f"=== {nom} ===")
+        resultats = analyser_ventes(donnees)
+        for cle, valeur in resultats.items():
+            print(f"{cle} : {valeur}")
+        print()
